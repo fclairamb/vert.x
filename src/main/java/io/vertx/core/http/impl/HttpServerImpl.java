@@ -24,6 +24,8 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.ChannelGroupFuture;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.haproxy.HAProxyMessage;
+import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -322,6 +324,9 @@ public class HttpServerImpl implements HttpServer, Closeable, MetricsProvider {
     if (USE_FLASH_POLICY_HANDLER) {
       pipeline.addLast("flashpolicy", new FlashPolicyHandler());
     }
+    if (options.isProxyProtocol()) {
+      pipeline.addLast("proxyProtoDecoder", new HAProxyMessageDecoder());
+    }
     pipeline.addLast("httpDecoder", new HttpRequestDecoder(options.getMaxInitialLineLength()
         , options.getMaxHeaderSize(), options.getMaxChunkSize(), false));
     pipeline.addLast("httpEncoder", new VertxHttpResponseEncoder());
@@ -611,7 +616,12 @@ public class HttpServerImpl implements HttpServer, Closeable, MetricsProvider {
           if (conn != null) {
             conn.handleMessage(msg);
           }
-        } else {
+        } else if (msg instanceof HAProxyMessage) {
+          HAProxyMessage hapm = (HAProxyMessage) msg;
+          conn.getContext().put("proxySource", hapm.sourceAddress()+":"+hapm.sourcePort());
+        }
+
+        else {
           throw new IllegalStateException("Invalid message " + msg);
         }
       } else {

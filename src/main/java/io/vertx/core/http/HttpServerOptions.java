@@ -320,6 +320,17 @@ public class HttpServerOptions extends NetServerOptions {
     return this;
   }
 
+  private boolean proxyProtocol;
+
+  public boolean isProxyProtocol() {
+    return proxyProtocol;
+  }
+
+  public HttpServerOptions setProxyProtocol(boolean proxyProtocol) {
+    this.proxyProtocol = proxyProtocol;
+    return this;
+  }
+
   /**
    * @return  the maximum websocket framesize
    */

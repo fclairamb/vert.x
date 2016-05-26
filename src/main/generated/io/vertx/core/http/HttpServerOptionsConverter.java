@@ -56,6 +56,9 @@ public class HttpServerOptionsConverter {
     if (json.getValue("maxWebsocketFrameSize") instanceof Number) {
       obj.setMaxWebsocketFrameSize(((Number)json.getValue("maxWebsocketFrameSize")).intValue());
     }
+    if (json.getValue("proxyProtocol") instanceof Boolean) {
+      obj.setProxyProtocol((Boolean)json.getValue("proxyProtocol"));
+    }
     if (json.getValue("websocketSubProtocols") instanceof String) {
       obj.setWebsocketSubProtocols((String)json.getValue("websocketSubProtocols"));
     }
@@ -78,6 +81,7 @@ public class HttpServerOptionsConverter {
     json.put("maxHeaderSize", obj.getMaxHeaderSize());
     json.put("maxInitialLineLength", obj.getMaxInitialLineLength());
     json.put("maxWebsocketFrameSize", obj.getMaxWebsocketFrameSize());
+    json.put("proxyProtocol", obj.isProxyProtocol());
     if (obj.getWebsocketSubProtocols() != null) {
       json.put("websocketSubProtocols", obj.getWebsocketSubProtocols());
     }

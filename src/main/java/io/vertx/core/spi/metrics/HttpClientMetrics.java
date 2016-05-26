@@ -40,7 +40,39 @@ import io.vertx.core.net.SocketAddress;
  *
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
-public interface HttpClientMetrics<R, W, S> extends TCPMetrics<S> {
+public interface HttpClientMetrics<R, W, S, Q> extends TCPMetrics<S> {
+
+  /**
+   * Called when a connection queue for a server is created.
+   *
+   * @param host the server host possibly unresolved
+   * @param port the server port
+   * @return the queue metric
+   */
+  Q createConnectionQueue(String host, int port);
+
+  /**
+   * Called when a queue is closed.
+   *
+   * @param host the server host
+   * @param port the server port
+   * @param queueMetric the queue metric returned by {@link #createConnectionQueue}
+   */
+  void closeConnectionQueue(String host, int port, Q queueMetric);
+
+  /**
+   * Called a connection is requested.
+   *
+   * @param queueMetric the queue metric returned by {@link #createConnectionQueue}
+   */
+  void enqueue(Q queueMetric);
+
+  /**
+   * Called a request for connection is satisfied.
+   *
+   * @param queueMetric the queue metric returned by {@link #createConnectionQueue}
+   */
+  void dequeue(Q queueMetric);
 
   /**
    * Called when an http client request begins. Vert.x will invoke {@link #responseEnd} when the response has ended
